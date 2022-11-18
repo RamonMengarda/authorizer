@@ -11,7 +11,7 @@ public class CardFactory implements ICardFactory {
 
     @Override
     public Card create(Long number, String password) {
-        return new Card(number, new BigDecimal("500.00"), password);
+        return new Card(null, number, new BigDecimal("500.00"), password, null);
     }
 
 }
