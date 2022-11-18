@@ -18,6 +18,13 @@ public class CardService {
     @Autowired
     private CardRepository cardRepository;
 
+    /*
+     * Because there's a project constraint stating that all cards need to be
+     * created with a 500.00 balance
+     * we'll implement a factory that can help enforcing that rule as well as making
+     * it easier to change when
+     * necessary
+     */
     public Card create(Long number, String password) {
         return cardFactory.create(number, password);
     }

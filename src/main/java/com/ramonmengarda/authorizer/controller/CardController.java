@@ -48,6 +48,15 @@ public class CardController {
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(responseBody);
         } catch (ObjectOptimisticLockingFailureException e) {
+            /*
+             * This was a developer's assumption.
+             * 
+             * Because we might be dealing with simultaneous access on the resources, I've
+             * created a new
+             * REST response that's not on the list of requirements, but I thought would be
+             * necessary to
+             * inform the caller that his request didn't go through and why.
+             */
             responseBody.clear();
             responseBody.put("FAILURE",
                     "Card creation is locked due to too many simultaneous requests for the database. Try again.");
@@ -111,7 +120,15 @@ public class CardController {
 
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(e.getMessage());
         } catch (ObjectOptimisticLockingFailureException e) {
-
+            /*
+             * This was a developer's assumption.
+             * 
+             * Because we might be dealing with simultaneous access on the resources, I've
+             * created a new
+             * REST response that's not on the list of requirements, but I thought would be
+             * necessary to
+             * inform the caller that his request didn't go through and why.
+             */
             return ResponseEntity.status(HttpStatus.LOCKED).body(
                     "Transactions are locked due to too many simultaneous requests for the database. The balance value for the desired card might have changed. Try again.");
         }
