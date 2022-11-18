@@ -23,4 +23,8 @@ public class CardService {
     public Card save(Card card) {
         return cardRepository.save(card);
     }
+
+    public List<Card> getCardsByNumber(Long number) {
+        return cardRepository.findByNumber(number);
+    }
 }
