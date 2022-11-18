@@ -10,5 +10,5 @@ import com.ramonmengarda.authorizer.model.Card;
 @Repository
 public interface CardRepository extends JpaRepository<Card, Long> {
 
-    Listt<Card> findByNumber(Long number);
+    List<Card> findByNumber(Long number);
 }
