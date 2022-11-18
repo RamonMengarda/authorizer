@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.ramonmengarda.authorizer.exceptions.InsufficientBalanceException;
+import com.ramonmengarda.authorizer.exceptions.InvalidPasswordException;
 import com.ramonmengarda.authorizer.exceptions.NonexistentCardException;
 import com.ramonmengarda.authorizer.model.Card;
 import com.ramonmengarda.authorizer.service.CardService;
@@ -70,5 +72,48 @@ public class CardController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
 
+    }
+
+    @PostMapping("/transacoes")
+    @ResponseBody
+    public ResponseEntity<String> transaction(@RequestBody JSONObject transactionJson) {
+
+        try {
+
+            List<Card> cardList = cardService
+                    .getCardsByNumber(Long.parseLong(transactionJson.get("numeroCartao").toString()));
+
+            if (cardList.isEmpty()) {
+                throw new NonexistentCardException("CARTAO_INEXISTENTE");
+            }
+
+            Card card = cardList.get(0);
+
+            if (!card.getPassword().equals(transactionJson.get("senha").toString())) {
+                throw new InvalidPasswordException("SENHA_INVALIDA");
+            }
+
+            if (card.getBalance().compareTo(new BigDecimal(transactionJson.get("valor").toString())) != -1) {
+                card.setBalance(card.getBalance().subtract(new BigDecimal(transactionJson.get("valor").toString())));
+                cardService.save(card);
+            } else {
+                throw new InsufficientBalanceException("SALDO_INSUFICIENTE");
+            }
+
+            return ResponseEntity.status(HttpStatus.CREATED).body("OK");
+        } catch (NonexistentCardException e) {
+
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("CARTAO_INEXISTENTE");
+        } catch (InvalidPasswordException e) {
+
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(e.getMessage());
+        } catch (InsufficientBalanceException e) {
+
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(e.getMessage());
+        } catch (ObjectOptimisticLockingFailureException e) {
+
+            return ResponseEntity.status(HttpStatus.LOCKED).body(
+                    "Transactions are locked due to too many simultaneous requests for the database. The balance value for the desired card might have changed. Try again.");
+        }
     }
 }
