@@ -6,6 +6,10 @@ Created by Ramon Mengarda.
 
 <hr>
 
+This test is a simple demo of a credit card operation authorizer.
+
+<hr>
+
 ## Running Locally
 
 To run this application locally, you'll need:
